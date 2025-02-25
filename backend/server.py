@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from ytmusicapi import YTMusic
 
+print("Starting server...")
 app = Flask(__name__)
 CORS(app)
 ytmusic = YTMusic()
@@ -13,6 +14,7 @@ search_cache = {}
 def search():
     query = request.args.get('query')
     if not query:
+        print("Missing query parameter")
         return jsonify({"error": "Missing query parameter"}), 400
 
     # ✅ Check cache first
