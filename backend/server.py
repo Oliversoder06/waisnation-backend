@@ -6,17 +6,37 @@ app = Flask(__name__)
 CORS(app)
 ytmusic = YTMusic()
 
+# Simple cache to reduce API requests
+search_cache = {}
+
 @app.route('/search', methods=['GET'])
 def search():
     query = request.args.get('query')
     if not query:
         return jsonify({"error": "Missing query parameter"}), 400
 
-    results = ytmusic.search(query, filter="songs")
-    if results:
-        return jsonify({"videoId": results[0]['videoId']})
+    # ✅ Check cache first
+    if query in search_cache:
+        return jsonify(search_cache[query])
 
-    return jsonify({"videoId": None})
+    # ✅ Fetch song details
+    results = ytmusic.search(query, filter="songs")
+    
+    if results:
+        first_result = results[0]
+        song_data = {
+            "videoId": first_result["videoId"],
+            "title": first_result["title"],
+            "artist": first_result["artists"][0]["name"] if first_result.get("artists") else "Unknown Artist",
+            "duration": first_result["duration"],
+            "thumbnail": first_result["thumbnails"][-1]["url"] if first_result.get("thumbnails") else None
+        }
+
+        # ✅ Save to cache
+        search_cache[query] = song_data
+        return jsonify(song_data)
+
+    return jsonify({"error": "No results found"}), 404
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True)
