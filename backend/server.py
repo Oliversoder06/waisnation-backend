@@ -4,7 +4,7 @@ from ytmusicapi import YTMusic
 
 print("Starting server...")
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins="https://wais-nation.vercel.app")
 ytmusic = YTMusic()
 
 # Simple cache to reduce API requests
