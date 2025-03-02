@@ -6,7 +6,8 @@ import os
 
 print("Starting server...")
 app = Flask(__name__)
-CORS(app, origins="https://wais-nation.vercel.app")
+CORS(app, origins=["https://wais-nation.vercel.app", "http://localhost:3000"])
+
 ytmusic = YTMusic()
 
 # Simple cache to reduce API requests
